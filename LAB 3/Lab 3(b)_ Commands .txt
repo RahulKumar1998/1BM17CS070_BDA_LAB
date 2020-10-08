@@ -1,0 +1,71 @@
+> use Customer
+switched to db Customer
+> db.createCollection("Customers");
+{ "ok" : 1 }
+> db.Customers.insert({_id:1,cust_id:1001,acc_bal:25000.0,acc_type:"Savings"});
+WriteResult({ "nInserted" : 1 })
+> db.Customers.insert({_id:2,cust_id:1001,acc_bal:10000.0,acc_type:"Current"});
+WriteResult({ "nInserted" : 1 })
+> db.Customers.insert({_id:3,cust_id:1002,acc_bal:1000.0,acc_type:"Current"});
+WriteResult({ "nInserted" : 1 })
+> db.Customers.insert({_id:4,cust_id:1002,acc_bal:2000.0,acc_type:"Savings"});
+WriteResult({ "nInserted" : 1 })
+> db.Customers.insert({_id:5,cust_id:1003,acc_bal:200.0,acc_type:"Current"});
+WriteResult({ "nInserted" : 1 })
+> db.Customers.insert({_id:6,cust_id:1003,acc_bal:700.0,acc_type:"Savings"});
+WriteResult({ "nInserted" : 1 })
+
+CUSTOMERS WHOSE TOTAL BALANCE IS GREATER THAN 1200 IN CURRENT ACCOUNT:
+
+> db.Customers.aggregate({$match : {acc_type:"Current"}}, {$group : {_id:"$cust_id", totalBaln: {$sum :"$acc_bal"}}}, {$match : {totalBaln : {$gt : 1200}}})
+{ "_id" : 1001, "totalBaln" : 10000 }
+
+CUSTOMERS WHOSE TOTAL BALANCE IS GREATER THAN 1200 IN SAVINGS ACCOUNT:
+
+> db.Customers.aggregate({$match : {acc_type:"Savings"}}, {$group : {_id:"$cust_id", totalBaln: {$sum :"$acc_bal"}}}, {$match : {totalBaln : {$gt : 1200}}})
+{ "_id" : 1002, "totalBaln" : 2000 }
+{ "_id" : 1001, "totalBaln" : 25000 }
+
+MAX BALANCE FOR ALL CUSTOMERS ACROSS ANY ACCOUNT TYPE:
+
+> db.Customers.aggregate({$group : {_id:"$cust_id", maxBaln: {$max : "$acc_bal"}}});
+{ "_id" : 1002, "maxBaln" : 2000 }
+{ "_id" : 1001, "maxBaln" : 25000 }
+{ "_id" : 1003, "maxBaln" : 700 }
+
+MIN BALANCE FOR ALL CUSTOMERS ACROSS ANY ACCOUNT TYPE:
+
+> db.Customers.aggregate({$group : {_id:"$cust_id", minBaln: {$min : "$acc_bal"}}});
+{ "_id" : 1002, "minBaln" : 1000 }
+{ "_id" : 1003, "minBaln" : 200 }
+{ "_id" : 1001, "minBaln" : 10000 }
+
+COMMAND TO EXPORT CUSTOMERS DATABASE TO LOCAL CSV FILE:
+
+C:\Program Files\MongoDB\Server\4.4\bin> mongoexport -d Customer -c Customers -f cust_id,acc_bal,acc_type --csv -o c:\bda\C_output.csv
+2020-10-08T16:09:58.955+0530    csv flag is deprecated; please use --type=csv instead
+2020-10-08T16:09:59.586+0530    connected to: mongodb://localhost/
+2020-10-08T16:09:59.598+0530    exported 6 records
+
+
+> db.Customers.drop()                                                   //COMMAND TO DROP A TABLE
+true                                                                    //TABLE DROPPED
+> db.Customers.find()                                                   //TABLE EMPTY
+
+COMMAND TO IMPORT LOCAL CSV FILE DATA INTO CUSTOMERS DATABASE:
+
+C:\Program Files\MongoDB\Server\4.4\bin>mongoimport -d Customer -c Customers --type csv --headerline --file C:\bda\C_output.csv
+2020-10-08T16:11:48.847+0530    connected to: mongodb://localhost/
+2020-10-08T16:11:48.878+0530    6 document(s) imported successfully. 0 document(s) failed to import.
+
+
+AFTER IMPORT, FINAL OUTPUT:
+
+> db.Customers.find()
+{ "_id" : ObjectId("5f7eececfa91c9ca3e5bda2a"), "cust_id" : 1001, "acc_bal" : 10000, "acc_type" : "Current" }
+{ "_id" : ObjectId("5f7eececfa91c9ca3e5bda2b"), "cust_id" : 1002, "acc_bal" : 1000, "acc_type" : "Current" }
+{ "_id" : ObjectId("5f7eececfa91c9ca3e5bda2c"), "cust_id" : 1002, "acc_bal" : 2000, "acc_type" : "Savings" }
+{ "_id" : ObjectId("5f7eececfa91c9ca3e5bda2d"), "cust_id" : 1003, "acc_bal" : 200, "acc_type" : "Current" }
+{ "_id" : ObjectId("5f7eececfa91c9ca3e5bda2e"), "cust_id" : 1003, "acc_bal" : 700, "acc_type" : "Savings" }
+{ "_id" : ObjectId("5f7eececfa91c9ca3e5bda2f"), "cust_id" : 1001, "acc_bal" : 25000, "acc_type" : "Savings" }
+>
