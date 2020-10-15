@@ -1,0 +1,187 @@
+ASSIGNMENT 1
+
+> db.books.save({_id:1,Category:"Machine Learning",Bookname:"Machine Learning for Hackers", Author:"Drew Conway",qty:25,price:400,rol:30,pages:350});
+WriteResult({ "nMatched" : 0, "nUpserted" : 1, "nModified" : 0, "_id" : 1 })
+> db.books.save({_id:2,Category:"Business Intelligence",Bookname:"Fundamentals of Business Analytics", Author:"Seema Acharya",qty:55,price:500,rol:30,pages:250});
+WriteResult({ "nMatched" : 0, "nUpserted" : 1, "nModified" : 0, "_id" : 2 })
+> db.books.save({_id:3,Category:"Analytics",Bookname:"Competing on Analytics", Author:"Thomas Davenport",qty:8,price:150,rol:20,pages:150});
+WriteResult({ "nMatched" : 0, "nUpserted" : 1, "nModified" : 0, "_id" : 3 })
+> db.books.save({_id:4,Category:"Visualization",Bookname:"Visualizing Data", Author:"Ben Fry",qty:12,price:325,rol:6,pages:450});
+WriteResult({ "nMatched" : 0, "nUpserted" : 1, "nModified" : 0, "_id" : 4 })
+> db.books.save({_id:5,Category:"Web Mining",Bookname:"Visualizing Data", Author:"Richard Cotton",qty:15,price:850,rol:10,pages:120});
+WriteResult({ "nMatched" : 0, "nUpserted" : 1, "nModified" : 0, "_id" : 5 })
+> db.books.find().pretty()
+{
+        "_id" : 1,
+        "Category" : "Machine Learning",
+        "Bookname" : "Machine Learning for Hackers",
+        "Author" : "Drew Conway",
+        "qty" : 25,
+        "price" : 400,
+        "rol" : 30,
+        "pages" : 350
+}
+{
+        "_id" : 2,
+        "Category" : "Business Intelligence",
+        "Bookname" : "Fundamentals of Business Analytics",
+        "Author" : "Seema Acharya",
+        "qty" : 55,
+        "price" : 500,
+        "rol" : 30,
+        "pages" : 250
+}
+{
+        "_id" : 3,
+        "Category" : "Analytics",
+        "Bookname" : "Competing on Analytics",
+        "Author" : "Thomas Davenport",
+        "qty" : 8,
+        "price" : 150,
+        "rol" : 20,
+        "pages" : 150
+}
+{
+        "_id" : 4,
+        "Category" : "Visualization",
+        "Bookname" : "Visualizing Data",
+        "Author" : "Ben Fry",
+        "qty" : 12,
+        "price" : 325,
+        "rol" : 6,
+        "pages" : 450
+}
+{
+        "_id" : 5,
+        "Category" : "Web Mining",
+        "Bookname" : "Visualizing Data",
+        "Author" : "Richard Cotton",
+        "qty" : 15,
+        "price" : 850,
+        "rol" : 10,
+        "pages" : 120
+}
+
+
+> var map = function(){
+... ...     var category;
+... ...     if(this.pages>=300)
+... ...         category = "Big books"
+... ...     else
+... ...         category = "Small Books"
+... ...     emit(category, {
+... ...         Bookname : this.Bookname});
+... ... }
+
+>  var reduce = function(key, values){
+... ...    return values.length
+... ... };
+
+
+> db.books.mapReduce(map, reduce, {out: "Bookcategory"})
+{
+... "result" : "Bookcategory",
+... "timeMillis" : 678,
+... "counts" : {
+... "input" : 5,
+... "emit" : 5,
+... "reduce" : 2,
+... "output" : 2
+... },
+... "ok" : 1
+};
+
+> db.Bookcategory.find().pretty()
+{ "_id" : "Big books", "value" : 2 }
+{ "_id" : "Small Books", "value" : 3 }
+
+=======================================================================================================================================================================
+ASSIGNMENT 2
+
+ use mongoDB
+switched to db mongoDB
+> db.createCollection("MongoDBHandsOn");
+{ "ok" : 1 }
+
+COMMAND TO IMPORT BANK-DATA.CSV INTO COLLECTION:
+
+C:\Program Files\MongoDB\Server\4.4\bin>mongoimport -d mongoDB -c MongoDBHandsOn --type csv --headerline --file C:\Users\Rahul\Documents\bank-data.csv"
+2020-10-15T16:10:41.963+0530    connected to: mongodb://localhost/
+2020-10-15T16:10:42.005+0530    600 document(s) imported successfully. 0 document(s) failed to import.
+
+> db.MongoDBHandsOn.aggregate([
+...     { $group : { _id: null, sum: {$sum:"$children"} } }
+... ]);
+
+{ "_id" : null, "sum" : 607 }
+
+> db.MongoDBHandsOn.aggregate([
+...     { $group : { _id: "Avg of Age", avg: {$avg:"$age"} } }
+... ])
+
+{ "_id" : "Avg of Age", "avg" : 42.395 }
+
+========================================================================================================================================================================
+
+ASSIGNMENT 3
+
+> use myDB
+switched to db myDB
+> db.createCollection("Country");
+{ "ok" : 1 }
+> db.Country.insert({_id:1,Cities:["Delhi","Bangalore"]});
+WriteResult({ "nInserted" : 1 })
+> db.Country.insert({_id:2,Cities:["Chennai","Mumbai","Patna"]});
+WriteResult({ "nInserted" : 1 })
+> db.Country.insert({_id:3,Cities:["Pune","Jamshedpur","Hyderabad"]});
+WriteResult({ "nInserted" : 1 })
+
+> db.Country.find()
+
+{ "_id" : 1, "Cities" : [ "Delhi", "Bangalore" ] }
+{ "_id" : 2, "Cities" : [ "Chennai", "Mumbai", "Patna" ] }
+{ "_id" : 3, "Cities" : [ "Pune", "Jamshedpur", "Hyderabad" ] }
+
+> db.Country.find().limit(1)
+
+{ "_id" : 1, "Cities" : [ "Delhi", "Bangalore" ] }
+
+> db.Country.find().skip(2).limit(2)
+
+{ "_id" : 3, "Cities" : [ "Pune", "Jamshedpur", "Hyderabad" ] }
+
+> db.Country.update({_id:1},{$push:{population:{Delhi:30,Bangalore:45}}});
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+> db.Country.find()
+{ "_id" : 1, "Cities" : [ "Delhi", "Bangalore" ], "population" : [ { "Delhi" : 30, "Bangalore" : 45 } ] }
+{ "_id" : 2, "Cities" : [ "Chennai", "Mumbai", "Patna" ] }
+{ "_id" : 3, "Cities" : [ "Pune", "Jamshedpur", "Hyderabad" ] }
+
+> db.Country.update({_id:3},{$pop:{Cities:1}});
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.Country.find()
+
+{ "_id" : 1, "Cities" : [ "Delhi", "Bangalore" ], "population" : [ { "Delhi" : 30, "Bangalore" : 45 } ] }
+{ "_id" : 2, "Cities" : [ "Chennai", "Mumbai", "Patna" ] }
+{ "_id" : 3, "Cities" : [ "Pune", "Jamshedpur" ] }
+
+> db.Country.update({Cities:"Chennai"},{$pull:{Cities:"Chennai"}});
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+> db.Country.find()
+
+{ "_id" : 1, "Cities" : [ "Delhi", "Bangalore" ], "population" : [ { "Delhi" : 30, "Bangalore" : 45 } ] }
+{ "_id" : 2, "Cities" : [ "Mumbai", "Patna" ] }
+{ "_id" : 3, "Cities" : [ "Pune", "Jamshedpur" ] }
+
+> db.Country.update({_id:1},{$set:{'Cities.2':"Srinagar"}});
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.Country.update({_id:2},{$addToSet:{Cities:"Mysore"}});
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+
+> db.Country.find()
+
+{ "_id" : 1, "Cities" : [ "Delhi", "Bangalore", "Srinagar" ], "population" : [ { "Delhi" : 30, "Bangalore" : 45 } ] }
+{ "_id" : 2, "Cities" : [ "Mumbai", "Patna", "Mysore" ] }
+{ "_id" : 3, "Cities" : [ "Pune", "Jamshedpur" ] }
